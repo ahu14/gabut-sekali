@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../public/Montserrat-Medium.ttf');
+}
+
+body{
+    font-family: 'Montserrat', sans-serif;
+}
+
+a{
+    color: #067eed;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+}
+
+a:hover{
+    text-decoration: underline;
+}
