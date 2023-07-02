@@ -6,11 +6,11 @@ import Link from "next/link";
 
 
 export async function getStaticPaths(){
-    let datas = await getDocs(collection(db, 'identity'));
+    let data = await getDocs(collection(db, 'identity'));
     let paths:any[] = [];
-
-    datas.forEach(data => paths.push({params: {name: data.data().name}}))
-    return {paths, fallback: false}
+    
+    data.forEach((d:any) => paths.push({params: {id: d.id}}));
+    return {paths, fallback: true};
 }
 
 
@@ -19,7 +19,7 @@ export async function getStaticProps({params}:any){
     let data;
     
     datas.forEach((d:any) => {
-        if (d.data().name == params.name){
+        if (d.id == params.id){
             data = {
                 id: d.id,
                 data: d.data()
@@ -66,23 +66,30 @@ export default function Edit({data}:any){
         }
     }
 
-    return(
-        <form className={styles.dataForm} onSubmit={submitted} id={data.id}>
-            <Link href="/">Go back</Link>
 
-            <label id={styles.labelInput} htmlFor="name">Name</label>
-            <input className={styles.input} id="name" 
-            name="name" defaultValue={data.data.name}/>
+    if (router.isFallback){
+        return <h2>Loading...</h2>
+    }
 
-            <label id={styles.labelInput} htmlFor="age">Age</label>
-            <input className={styles.input} type="number" 
-            id="age" name="age" defaultValue={data.data.age}/>
-
-            <label id={styles.labelInput} htmlFor="hobby">Hobby</label>
-            <textarea id="hobby" name="hobby" defaultValue={data.data.hobby}
-            className={styles.textarea} style={{resize: 'none'}} />
-
-            <button className={styles.btn}>Save editted data !</button>
-        </form>
-    )
+    else{
+        return(
+            <form className={styles.dataForm} onSubmit={submitted} id={data.id}>
+                <Link href="/">Go back</Link>
+    
+                <label id={styles.labelInput} htmlFor="name">Name</label>
+                <input className={styles.input} id="name" 
+                name="name" defaultValue={data.data.name}/>
+    
+                <label id={styles.labelInput} htmlFor="age">Age</label>
+                <input className={styles.input} type="number" 
+                id="age" name="age" defaultValue={data.data.age}/>
+    
+                <label id={styles.labelInput} htmlFor="hobby">Hobby</label>
+                <textarea id="hobby" name="hobby" defaultValue={data.data.hobby}
+                className={styles.textarea} style={{resize: 'none'}} />
+    
+                <button className={styles.btn}>Save editted data !</button>
+            </form>
+        )
+    }
 }
