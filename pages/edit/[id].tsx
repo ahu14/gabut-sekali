@@ -5,29 +5,21 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 
 
-export async function getStaticPaths(){
-    let data = await getDocs(collection(db, 'identity'));
-    let paths:any[] = [];
+export async function getServerSideProps(context:any){
+    let id = context.params.id;
+    let allData = await getDocs(collection(db, 'identity'));
     
-    data.forEach((d:any) => paths.push({params: {id: d.id}}));
-    return {paths, fallback: true};
-}
-
-
-export async function getStaticProps({params}:any){
-    let datas = await getDocs(collection(db, 'identity'));
     let data;
-    
-    datas.forEach((d:any) => {
-        if (d.id == params.id){
+    allData.forEach((d:any) => {
+        if (d.id == id){
             data = {
                 id: d.id,
                 data: d.data()
             }
         }
-    })
-
-    return {props: {data}};
+    });
+    
+    return {props: {data}}
 }
 
 

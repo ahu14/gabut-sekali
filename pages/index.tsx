@@ -2,6 +2,7 @@ import {db} from "../lib/db";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { collection, getDocs } from "firebase/firestore";
+import { useEffect } from "react";
 
 
 export async function getServerSideProps(){
@@ -14,6 +15,7 @@ export async function getServerSideProps(){
             name: doc.data().name
         })
     })
+
     return {props: {data}}
 }
 
@@ -25,8 +27,8 @@ export default function Home({data}:any){
                 {data.map((d:any) => (
                     <li id={styles.childList} key={d.id}>
                         <Link href={`/${d.id}`}>{d.name}</Link>&nbsp;
-                        <Link href={`edit/${d.id}`}>edit</Link>&nbsp;
-                        <Link href={`api/delete/${d.id}`}>delete</Link>
+                        <Link href={`/edit/${d.id}`}>edit</Link>&nbsp;
+                        <Link href={`/api/delete/${d.id}`}>delete</Link>
                     </li>
                 ))}
             </ul>
