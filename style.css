@@ -45,4 +45,6 @@ body{
   border-radius: 50%;
   background-color: orange;
   display: none;
+  cursor: pointer;
+  z-index: 100;
 }
