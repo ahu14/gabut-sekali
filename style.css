@@ -1,0 +1,50 @@
+body{
+  margin: 0;
+  padding: 0;
+  
+  width: 100vw;
+  height: 100vh;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chess-box{
+  width: 50.4vh;
+  height: 50.4vh;
+  
+  display: grid;
+  grid-template-rows: repeat(8, 6.3vh);
+  border: 2px solid brown;
+}
+
+.chess-row{
+  width: inherit;
+  height: 6.3vh;
+  
+  display: grid;
+  grid-template-columns: repeat(8, 6.3vh);
+}
+
+
+.white-box, .black-box{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+}
+
+.black-box{
+  background: brown;
+}
+
+.circle{
+  width: 2vh;
+  height: 2vh;
+  border-radius: 50%;
+  background-color: orange;
+  display: none;
+  cursor: pointer;
+  z-index: 100;
+}
