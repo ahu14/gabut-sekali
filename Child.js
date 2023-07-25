@@ -12,6 +12,7 @@ class Chess{
         ]
         this.prevColor = null;
         this.imageClick = null;
+        this.circleActive = false;
         this.moves = [];
     }
 
@@ -130,7 +131,7 @@ class Chess{
                 }
             }
 
-            if (color != 'black'){
+            if (color != 'black' || type2 == 'ratu'){
                 moveForward2(y, x, '1');
                 moveForward2(y, x, '2');
             }
@@ -205,11 +206,6 @@ class Chess{
                         if (this.chess_pos[y3][x3] == '0'){
                             this.moves.push({y: y3, x: x3})
                         }
-
-                        else{
-                            this.moves.push({y: y3, x: x3})
-                            break;
-                        }
                     }
                 }
                 break;
@@ -220,7 +216,9 @@ class Chess{
     }
 
     deleteCircle(){
+        this.circleActive = false;
         let circles = document.querySelectorAll('.circle');
+
         circles.forEach(circle => {
             circle.style.display = "none";
         });
@@ -228,16 +226,6 @@ class Chess{
 
     detectCircle(e, y, x, yprev, xprev, prevtype, type, color){
         this.deleteCircle();
-
-        /*console.log(this.chess_pos);
-        console.log('current pos: ' + y + ' ' + x);
-        console.log('previous pos: ' + yprev + ' ' + xprev);
-        console.log('current type : ' + type);
-        console.log('previous type : ' + prevtype);
-        console.log('image click : ' + this.imageClick.id);
-        console.log('color : ' + color);
-        console.log('');*/
-
         
         if (prevtype == type){
             prevtype = 0;
@@ -245,6 +233,7 @@ class Chess{
 
         this.chess_pos[y][x] = type;
         this.chess_pos[yprev][xprev] = prevtype;
+        this.prevColor = color;
 
         let chessBox = document.querySelector('.chess-box');
         chessBox.children[y].children[x].appendChild(this.imageClick);
@@ -255,6 +244,7 @@ class Chess{
     }
 
     addCircles(e, x, y, type, color){
+        this.deleteCircle();
         let chess_row = document.querySelectorAll('.chess-row');
 
         for (let data of this.moves){
@@ -275,54 +265,34 @@ class Chess{
                 let theEater = chess_row[y].children[x].children[1];
 
                 eatTarget.onclick = (e) => {
-                    e.target.remove();
-                    item.append(theEater);
-                    this.detectCircle(
-                        e, data['y'], data['x'], y, x, 
-                        type, this.imageClick.id, color
-                    );
+                    let eatTargetColor = e.target.src.includes('black') ? 'black' : 'white';
 
-                    /*else{
+                    if (this.circleActive && eatTargetColor != color){
+                        e.target.remove();
+                        item.append(theEater);
+                        this.detectCircle(
+                            e, data['y'], data['x'], y, x, 
+                            type, this.imageClick.id, color
+                        );
+                    }
+
+                    else{
                         this.imageClick = e.target;
-                        this.imageClick.onclick = (e) => {
-                            this.detectImgClick(e, data['x'], data['y'], this.imageClick.id, color)
-                        }
-                    }*/
+                        let newColor = this.imageClick.src.includes('black') ? 'black' : 'white';
+                        this.detectImgClick(e, data['x'], data['y'], this.imageClick.id, newColor);
+                    }
                 }
             }
         }
     }  
 
     detectImgClick(e, x, y, type, color){
-        /*console.log(e.target);
-        console.log(this.imageClick);
-        console.log('');*/
-
         if (this.prevColor == null || this.prevColor != color){
-            this.prevColor = color;
             this.imageClick = e.target;
             this.possibleMoves(y, x, type, color);
             this.addCircles(e, x, y, type, color);
+            this.circleActive = true;
         }
-        
-
-        //this.addCircle(x, y, type, color);
-
-        //this.imageClick = e.target;
-        
-        /*if (this.lastClick != null){
-            this.deleteCircle();
-        }
-
-        if (this.lastClick == e.target){
-            this.deleteCircle();
-            this.lastClick = null;
-        }
-
-        else{
-            this.lastClick = e.target;
-            this.addCircle(x, y, type);
-        }*/
     }
 
     addItem(img, x, y, type){
@@ -350,21 +320,24 @@ for (let i = 0; i < 8; i++){
     chess.addItem('./white_anak.jpg', i, 6, 'anak');
 }
 
-chess.addItem('./white_benteng.jpg', 0, 7, 'benteng');
-chess.addItem('./white_kuda.jpg', 1, 7, 'kuda');
-chess.addItem('./white_gajah.jpg', 2, 7, 'gajah');
-chess.addItem('./white_raja.jpg', 3, 7, 'raja');
-chess.addItem('./white_ratu.jpg', 4, 7, 'ratu');
-chess.addItem('./white_gajah.jpg', 5, 7, 'gajah');
-chess.addItem('./white_kuda.jpg', 6, 7, 'kuda');
-chess.addItem('./white_benteng.jpg', 7, 7, 'benteng');
+let automaticSummon = (data, y) => {
+    for (let a = 0; a < 8; a++){
+        let piece = data[a];
+        let color = data[a].includes('black') ? 'black' : 'white';
+        let getType = piece.replace(`${color}_`, '');
+        chess.addItem(`./${piece}.jpg`, a, y, getType);
+    }
+}
 
+let chessWhite = [
+    'white_benteng', 'white_kuda', 'white_gajah', 'white_raja', 
+    'white_ratu', 'white_gajah', 'white_kuda', 'white_benteng'
+]
 
-chess.addItem('./black_benteng.jpg', 0, 0, 'benteng');
-chess.addItem('./black_kuda.jpg', 1, 0, 'kuda');
-chess.addItem('./black_gajah.jpg', 2, 0, 'gajah');
-chess.addItem('./black_raja.jpg', 3, 0, 'raja');
-chess.addItem('./black_ratu.jpg', 4, 0, 'ratu');
-chess.addItem('./black_gajah.jpg', 5, 0, 'gajah');
-chess.addItem('./black_kuda.jpg', 6, 0, 'kuda');
-chess.addItem('./black_benteng.jpg', 7, 0, 'benteng');
+let chessBlack = [
+    'black_benteng', 'black_kuda', 'black_gajah', 'black_ratu', 
+    'black_raja', 'black_gajah', 'black_kuda', 'black_benteng'
+]
+
+automaticSummon(chessWhite, 7);
+automaticSummon(chessBlack, 0);
