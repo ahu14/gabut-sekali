@@ -1,39 +1,49 @@
-import {db} from "../lib/db";
-import Link from "next/link";
 import styles from "../styles/Home.module.css";
-import { collection, getDocs } from "firebase/firestore";
-import { useEffect } from "react";
+import {setCookie} from "../lib/cookie.js";
+import Template from "../lib/template.js";
+import { useRouter } from "next/router";
 
 
-export async function getServerSideProps(){
-    let docs = await getDocs(collection(db, "identity"));
-    let data:any[] = []
+export default function Form(){
+    let router = useRouter();
 
-    docs.forEach(doc => {
-        data.push({
-            id: doc.id,
-            name: doc.data().name
-        })
-    })
+    let submitData = (e:any) => {
+        e.preventDefault();
 
-    return {props: {data}}
-}
+        let err;
+        let checkIfBlank = (target:string) => {
+            target == '' 
+                ? err = "There's still blank"
+                : err = "Don't include space in player's name"
 
+            return target == '' || target.includes(' ');
+        }
 
-export default function Home({data}:any){
-    return (
-        <>
-            <ul className={styles.list}>
-                {data.map((d:any) => (
-                    <li id={styles.childList} key={d.id}>
-                        <Link href={`/${d.id}`}>{d.name}</Link>&nbsp;
-                        <Link href={`/edit/${d.id}`}>edit</Link>&nbsp;
-                        <Link href={`/api/delete/${d.id}`}>delete</Link>
-                    </li>
-                ))}
-            </ul>
+        let player1 = e.target.player1.value;
+        let player2 = e.target.player2.value;
 
-            <Link href="/add">Add data</Link>
-        </>
+        if (checkIfBlank(player1) == false && checkIfBlank(player2) == false){
+            setCookie('player1', player1);
+            setCookie('player2', player2);
+            router.push('/chess');
+        }
+
+        else{
+            e.target.children.errorMsg.innerHTML = err;
+        }
+    }
+
+    return(
+        <Template>
+            <form onSubmit={submitData} className={styles.formBox}>
+                <h4>Black</h4>
+                <input className={styles.inputBox} id="player2" name="player2" placeholder="Player 2"/>
+                <h2 id={styles.font}>VS</h2>
+                <h4>White</h4>
+                <input className={styles.inputBox} id="player1" name="player1" placeholder="Player 1"/>
+                <button type="submit" className={styles.submitBtn}>Submit</button>
+                <p id="errorMsg"></p>
+            </form>
+        </Template>
     )
 }

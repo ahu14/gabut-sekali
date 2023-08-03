@@ -1,4 +1,4 @@
-class Chess{
+export default class Chess{
     constructor(){
         this.chess_pos = [
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -17,7 +17,7 @@ class Chess{
     }
 
     getBox(x, y){
-        let chess_row = document.querySelectorAll('.chess-row');
+        let chess_row = document.querySelectorAll('#chess-row');
 
         for (let i = 0; i < chess_row[y].children.length; i++){
             if (x == i){
@@ -26,8 +26,8 @@ class Chess{
         }
     }
 
-    changePos(x, y, target){
-        this.chess_pos[y][x] = target;
+    changePos(x, y, target, color){
+        this.chess_pos[y][x] = `${target}-${color}`;
     }
 
 
@@ -217,7 +217,7 @@ class Chess{
 
     deleteCircle(){
         this.circleActive = false;
-        let circles = document.querySelectorAll('.circle');
+        let circles = document.querySelectorAll('#circle');
 
         circles.forEach(circle => {
             circle.style.display = "none";
@@ -231,11 +231,11 @@ class Chess{
             prevtype = 0;
         }
 
-        this.chess_pos[y][x] = type;
+        this.chess_pos[y][x] = `${type}-${color}`;
         this.chess_pos[yprev][xprev] = prevtype;
         this.prevColor = color;
 
-        let chessBox = document.querySelector('.chess-box');
+        let chessBox = document.querySelector('#chess-box');
         chessBox.children[y].children[x].appendChild(this.imageClick);
 
         this.imageClick.onclick = (e) => {
@@ -245,7 +245,7 @@ class Chess{
 
     addCircles(e, x, y, type, color){
         this.deleteCircle();
-        let chess_row = document.querySelectorAll('.chess-row');
+        let chess_row = document.querySelectorAll('#chess-row');
 
         for (let data of this.moves){
             let item = chess_row[data['y']].children[data['x']];
@@ -306,38 +306,8 @@ class Chess{
         let color = img.includes('white') ? 'white' : 'black';
         img2.onclick = (e) => this.detectImgClick(e, x, y, type, color)
 
-        this.changePos(x, y, type);
+        this.changePos(x, y, type, color);
+        this.getBox(x, y).prepend(img2);
         this.getBox(x, y).appendChild(img2);
     }
 }
-
-
-
-let chess = new Chess();
-
-for (let i = 0; i < 8; i++){
-    chess.addItem('./black_anak.jpg', i, 1, 'anak');
-    chess.addItem('./white_anak.jpg', i, 6, 'anak');
-}
-
-let automaticSummon = (data, y) => {
-    for (let a = 0; a < 8; a++){
-        let piece = data[a];
-        let color = data[a].includes('black') ? 'black' : 'white';
-        let getType = piece.replace(`${color}_`, '');
-        chess.addItem(`./${piece}.jpg`, a, y, getType);
-    }
-}
-
-let chessWhite = [
-    'white_benteng', 'white_kuda', 'white_gajah', 'white_raja', 
-    'white_ratu', 'white_gajah', 'white_kuda', 'white_benteng'
-]
-
-let chessBlack = [
-    'black_benteng', 'black_kuda', 'black_gajah', 'black_ratu', 
-    'black_raja', 'black_gajah', 'black_kuda', 'black_benteng'
-]
-
-automaticSummon(chessWhite, 7);
-automaticSummon(chessBlack, 0);

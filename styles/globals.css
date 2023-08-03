@@ -4,15 +4,15 @@
 }
 
 body{
+    margin: 0;
     padding: 0;
     font-family: 'Montserrat', sans-serif;
 
     width: fit-content;
     height: fit-content;
-    margin: 20px;
 }
 
-a{
+/*a{
     color: #067eed;
     text-decoration: none;
     transition: 0.2s ease-in-out;
@@ -20,4 +20,4 @@ a{
 
 a:hover{
     text-decoration: underline;
-}
+}*/
