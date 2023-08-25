@@ -10,14 +10,15 @@ body{
 
     width: fit-content;
     height: fit-content;
+    background: #e9e9e9;
 }
 
-/*a{
-    color: #067eed;
+a{
+    color:#067eed;
     text-decoration: none;
     transition: 0.2s ease-in-out;
 }
 
 a:hover{
-    text-decoration: underline;
-}*/
+    color:#004f99;
+}

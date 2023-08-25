@@ -25,13 +25,16 @@
   padding: 10px;
   font-size: 16px;
   font-family: inherit;
+  background: transparent;
+  border: 2px solid #000;
+  border-radius: 4px;
 }
 
 #font{
   padding: 3vh;
 }
 
-.submitBtn, .btnPlay{
+.submitBtn, .btnPlay, .btnDisplay, .homeButton{
   margin: 3vh 0;
   font-size: 16px;
   font-family: inherit;
@@ -86,7 +89,6 @@
   grid-template-columns: repeat(8, 6.3vh);
 }
 
-
 .whiteBox, .blackBox{
   display: flex;
   justify-content: center;
@@ -105,5 +107,108 @@
   background-color: orange;
   display: none;
   cursor: pointer;
+  position: absolute;
   z-index: 100;
+}
+
+
+
+/* History Styles */
+.historyBox{
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.scroller{
+  width: 60vw;
+  height: 75vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.playerData{
+  width: 40vw;
+  height: 20vh;
+  background: #ddd;
+  border-radius: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#link{
+  padding: 2vh 0;
+}
+
+.btnDisplay{
+  margin: 1vh 0;
+}
+
+.btnDisplay:hover{
+  background: #000;
+  color: #fff;
+}
+
+@media screen and (max-width: 768px){
+  .scroller{
+    width: 85vw;
+  }
+
+  .playerData{
+    width: 85vw;
+  }
+}
+
+
+
+/* Home Styles */
+.homeButton{
+  width: 200px;
+  height: 60px;
+  cursor: pointer;
+}
+
+.homeButton:hover{
+  background: #000;
+  color: #fff;
+}
+
+
+
+/* About Styles */
+.about{
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+
+
+/* ID Styles */
+.topData{
+  width: 100vw;
+  height: 22vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.bottomData{
+  width: 100vw;
+  height: 20vh;
+  text-align: center;
 }
