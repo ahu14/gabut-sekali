@@ -126,14 +126,14 @@
 }
 
 .scroller{
-  width: 60vw;
+  width: 50vw;
   height: 75vh;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .playerData{
-  width: 40vw;
+  width: 50vw;
   height: 20vh;
   background: #ddd;
   border-radius: 4px;

@@ -2,7 +2,6 @@ import { getDocs, collection } from "firebase/firestore";
 import { db } from "@/lib/db";
 import styles from "@/styles/Home.module.css";
 import { Suspense, useRef } from "react";
-import Template from "@/lib/template.js";
 import Link from "next/link";
 
 
@@ -62,7 +61,7 @@ export default function Data({data}:any){
                     <h3><b><Link href="/history">Go back</Link></b></h3>
                     <button onClick={summonLastPos} 
                     className={styles.btnDisplay}>Summon Chess Last Position</button>
-                    <h3 id="name">{data[0].player1}</h3>
+                    <h3 id="name">{data[0].player2}</h3>
                 </div>
 
                 <div id="chess-box" className={styles.chessBox} ref={chessbox}>
@@ -156,7 +155,7 @@ export default function Data({data}:any){
                 </div>
                 
                 <div className={styles.bottomData}>
-                    <h3 id="name">{data[0].player2}</h3>
+                    <h3 id="name">{data[0].player1}</h3>
                     <p>{data[0].player1} vs {data[0].player2}</p>
                     <p>{data[0].status}</p>
                 </div>
