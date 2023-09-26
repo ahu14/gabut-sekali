@@ -1,386 +1,138 @@
-import { useRouter } from "next/router";
-import { getCookie, setCookie } from "../lib/cookie.js";
-import { useEffect, Suspense } from "react";
-
-import ChessBoard from "../public/Child.js";
-import Template from "@/lib/template.js";
+import {Chess} from "chess.js";
+import Chessboard from "chessboardjsx";
+import {getCookie} from "../lib/cookie.js";
 import styles from "../styles/Home.module.css";
+import { useEffect, useState } from "react";
 
 
-export default function ChessTemplate(){
-    let chess = new ChessBoard();
-    let router = useRouter();
+export default function ChessGame(){
+    let [players, setPlayers] = useState<{player1: string, player2:string}>({
+        player1: '',
+        player2: ''
+    });
 
-    let start = (e:any) => {
-        e.target.remove();
+    let [game, setGame] = useState<any>(new Chess());
+    let [moves, setMoves] = useState<string>('');
+    let [listMoves, setListMoves] = useState<any>([]);
+    let [position, setPosition] = useState<object>({});
+    let [moveablePlace, setMoveable] = useState<object>({});
+    let [currentPlace, setCurrent] = useState<string>('');
 
-        for (let i = 0; i < 8; i++){
-            chess.addItem('./black_pawn.png', i, 1, 'pawn');
-            chess.addItem('./white_pawn.png', i, 6, 'pawn');
-        }
-        
-        let automaticSummon = (data:any, y:number) => {
-            for (let a = 0; a < 8; a++){
-                let piece = data[a];
-                let color = data[a].includes('black') ? 'black' : 'white';
-                let getType = piece.replace(`${color}_`, '');
-                chess.addItem(`./${piece}.png`, a, y, getType);
-            }
-        }
-        
-        let chessWhite = [
-            'white_rook', 'white_knight', 'white_bishop', 'white_king', 
-            'white_queen', 'white_bishop', 'white_knight', 'white_rook'
-        ]
-        
-        let chessBlack = [
-            'black_rook', 'black_knight', 'black_bishop', 'black_king', 
-            'black_queen', 'black_bishop', 'black_knight', 'black_rook'
-        ]
-        
-        automaticSummon(chessWhite, 7);
-        automaticSummon(chessBlack, 0);
-    }
+
+    let [msg, setMsg] = useState<string>('');
+    let [color, setColor] = useState<string>('white');
+
 
     useEffect(() => {
-        if (getCookie('player1') == '' || getCookie('player2') == ''){
-            router.replace('/');
+        setPlayers({player1: getCookie('player1'), player2: getCookie('player2')});
+        setMoves(game.fen());
+
+        document.addEventListener('mousemove', (e:any) => {
+            if (e.target.id == 'body'){
+                setMoveable({});
+            }
+        })
+    }, []);
+
+
+    useEffect(() => {
+        if (moveablePlace == {}){
+            setMoveable({});
+        }
+
+        if (listMoves.length > 0 && position != {}){
+            let list:any = {};
+
+            for (let i = 0; i < listMoves.length; i++){
+                if (listMoves[i].length > 2){
+                    let format = listMoves[i].slice(-2);
+                    list[format] = {
+                        background: "radial-gradient(circle, #fffc00 36%, transparent 40%)",
+                        borderRadius: "50%"
+                    };
+                }
+
+                else{
+                    list[listMoves[i]] = {
+                        background: "radial-gradient(circle, #fffc00 36%, transparent 40%)",
+                        borderRadius: "50%"
+                    };
+                }
+            }
+
+            setMoveable(list);
+        }
+    }, [listMoves, position]);
+
+
+
+    let hovering = (move:any) => {
+        if (currentPlace == '' && game.moves({square: move}).length > 0){
+            setListMoves([move, ...game.moves({square: move})]);
+            setCurrent(move);
+        }
+
+        else {
+            if (game.moves({square: move}).length > 0 && currentPlace == move){
+                setListMoves([move, ...game.moves({square: move})]);
+                setCurrent(move);
+            }
+
+            else{
+                setCurrent(move);
+                setMoveable({});
+            }
+        }
+    }
+
+
+    let clicked = (move:any) => {
+        let listLegalMoves = game.moves({square: move.sourceSquare});
+
+        if (listLegalMoves.length > 0){
+            for (let i of listLegalMoves){
+                if (move.targetSquare == move.sourceSquare){
+                    break;
+                }
+
+                if (i.includes(move.targetSquare)){
+                    game.move({
+                        from: move.sourceSquare,
+                        to: move.targetSquare,
+                        promotion: 'q'
+                    });
+        
+                    setMoves(game.fen());
+                    setListMoves([]);
+                    setMsg('');
+                    setColor(color == 'white' ? 'black' : 'white');
+                    break;
+                }
+
+                else{
+                    setMsg('invalid moves');
+                    setTimeout(() => setMsg(''), 1000);
+                }
+            }
         }
 
         else{
-            let names = document.querySelectorAll('#name');
-            let data = [getCookie('player2'), getCookie('player1')]
-            
-            for (let i = 0; i < names.length; i++){
-                names[i].innerHTML = data[i];
-            }
-
-            document.addEventListener('click', () => {
-                if (chess.status != null){
-                    let player1 = getCookie('player1');
-                    let player2 = getCookie('player2');
-
-                    let newChessArray = []
-
-                    for (let i = 0; i < chess.chess_pos.length; i++){
-                        newChessArray.push({data: chess.chess_pos[i]});
-                    }
-
-                    let data2 = {
-                        player1: player1,
-                        player2: player2,
-                        status: chess.status,
-                        chess: newChessArray
-                    }
-
-                    let JSONdata = JSON.stringify(data2);
-
-                    let endPoint = '/api/save';
-                    let options = {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSONdata
-                    }
-
-                    let result:any;
-                    fetch(endPoint, options)
-                    .then(res => result = res.json())
-                    .then(data => {
-                        chess.status = null;
-
-                        if (data.msg != undefined){
-                            router.push('/');
-                        }
-                    });
-                }
-            })
+            setMsg('invalid moves');
+            setTimeout(() => setMsg(''), 1000);
         }
-    }, [chess]);
+    }
+
 
     return (
-        <Template>
-            <script type="module" src="./Child.js" async />
-
-            <Suspense fallback={<h2>Reloading chess...</h2>}>
-                <h3 id="name"></h3>
-
-                <div id="chess-box" className={styles.chessBox}>
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                        
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                    
-                    <div id="chess-row" className={styles.chessRow}>
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="black-box" className={styles.blackBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-
-                        <div id="white-box" className={styles.whiteBox}>
-                            <div id="circle" className={styles.circle}></div>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 id="name"></h3>
-                <button onClick={start} className={styles.btnPlay}>Summon Chess Piece</button>
-            </Suspense>
-        </Template>
+        <div className={styles.body} id="body">
+            <h2>{players.player2}</h2>
+            <Chessboard position={moves} width={400} 
+            onMouseOverSquare={(move:any) => hovering(move)}
+            onDrop={(move:any) => clicked(move)} 
+            getPosition={position => setPosition(position)} 
+            squareStyles={moveablePlace}/>
+            <h2>{players.player1}</h2>
+            <p>{msg}</p>
+        </div>
     )
 }
