@@ -1,8 +1,67 @@
 import {Chess} from "chess.js";
-import Chessboard from "chessboardjsx";
+import {Chessboard} from "react-chessboard";
 import {getCookie} from "../lib/cookie.js";
 import styles from "../styles/Home.module.css";
 import {useEffect, useState} from "react";
+import Router from "next/router";
+
+
+interface PlayerData{
+    player1: string,
+    player2: string
+}
+
+
+/*export default function ChessGame(){
+    let [players, setPlayers] = useState<PlayerData>({
+        player1: '',
+        player2: ''
+    })
+
+    let [game, setGame] = useState<any>(new Chess());
+    let [moves, setMoves] = useState<any>()
+
+
+    let move = (piece:any) => {
+        let getMoves = game.moves({square: piece});
+
+
+        if (getMoves.length > 0){
+            let list:any = {};
+
+            for (let i = 0; i < getMoves.length; i++){
+                if (getMoves[i].length > 2){
+                    let numFormat = getMoves[i].search(/[0-9]/g);
+                    let strFormat = numFormat - 1;
+                    let format = `${getMoves[i][strFormat]}${getMoves[i][numFormat]}`;
+
+                    list[format] = {
+                        background: "radial-gradient(circle, #fffc00 36%, transparent 40%)",
+                        borderRadius: "50%"
+                    };
+
+                    setMoves([...list]);
+                }
+
+                else{
+                    list[getMoves[i]] = {
+                        background: "radial-gradient(circle, #fffc00 36%, transparent 40%)",
+                        borderRadius: "50%"
+                    };
+
+                    setMoves([...list]);
+                }
+            }
+        }
+    }
+
+    useEffect(() => console.log(moves), [moves]);
+
+    return (
+        <Chessboard id="chess-board" position={game.fen()} boardWidth={400} 
+        onMouseOverSquare={move} customSquareStyles={moves}/>
+    )
+}*/
 
 
 export default function ChessGame(){
@@ -54,7 +113,7 @@ export default function ChessGame(){
     
             fetch(endPoint, options)
             .then(res => res.json())
-            .then(msg => console.log(msg));
+            .then(msg => Router.push('/'));
         }
     }, [msg]);
 
@@ -114,71 +173,70 @@ export default function ChessGame(){
 
 
     let hovering = (move:any) => {
-        if (currentPlace == '' && game.moves({square: move}).length > 0){
+        if (game.moves({square: move}).length > 0){
             setListMoves([move, ...game.moves({square: move})]);
             setCurrent(move);
         }
 
-        else {
-            if (game.moves({square: move}).length > 0 && currentPlace == move){
-                setListMoves([move, ...game.moves({square: move})]);
-                setCurrent(move);
-            }
-
-            else{
-                setCurrent(move);
-                setMoveable({});
-            }
+        else{
+            setCurrent(move);
+            setMoveable({});
         }
     }
 
 
-    let clicked = (move:any) => {
-        let listLegalMoves = game.moves({square: move.sourceSquare});
+    let clicked = (sourceSquare:any, targetSquare:any, piece:any) => {
+        let listLegalMoves = game.moves({square: sourceSquare});
 
         if (listLegalMoves.length > 0){
-            for (let i of listLegalMoves){
-                if (move.targetSquare == move.sourceSquare){
+            for (let i in moveablePlace){
+                if (sourceSquare == targetSquare){
                     break;
                 }
 
-                if (i.includes(move.targetSquare)){
+                if (i == targetSquare){
                     game.move({
-                        from: move.sourceSquare,
-                        to: move.targetSquare,
+                        from: sourceSquare,
+                        to: targetSquare,
                         promotion: 'q'
                     });
-        
+
+                    setMoveable({});
                     setListMoves([]);
                     setColor(game.turn());
+                    setCurrent('');
                     setMsg('');
                     break;
                 }
 
                 else{
+                    setMoveable({});
                     setMsg('invalid moves');
-                    setTimeout(() => setMsg(''), 1000);
+                    setTimeout(() => setMsg(''), 1000);        
                 }
             }
         }
 
         else{
+            setMoveable({});
             setMsg('invalid moves');
             setTimeout(() => setMsg(''), 1000);
         }
     }
 
-
     return (
         <div className={styles.body} id="body">
-            <p>Now it's {color} turn</p>
-            <h2>{players.player2}</h2>
-            <Chessboard id="play-chess" position={game.fen()} width={400} 
-            onMouseOverSquare={(move:any) => hovering(move)}
-            onDrop={(move:any) => clicked(move)} 
-            getPosition={position => setPosition(position)} 
-            squareStyles={moveablePlace}/>
-            <h2>{players.player1}</h2>
+            {color == 'b' ? <h2 id={styles.bold}>{players.player2}</h2> : <h2 id={styles.thin}>{players.player2}</h2>}
+
+            <div className={styles.wrapper}>
+                <Chessboard id="chess-board" position={game.fen()} boardWidth={400} 
+                onMouseOverSquare={(move:any) => hovering(move)}
+                onPieceDrop={clicked} 
+                getPositionObject={position => setPosition(position)} 
+                customSquareStyles={moveablePlace} />
+            </div>
+            
+            {color == 'w' ? <h2 id={styles.bold}>{players.player1}</h2> : <h2 id={styles.thin}>{players.player1}</h2>}
             <h2>{msg}</h2>
         </div>
     )

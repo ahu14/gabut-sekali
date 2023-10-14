@@ -1,12 +1,12 @@
 import {db} from "../lib/db";
 import Link from "next/link";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, orderBy, query } from "firebase/firestore";
 import styles from "@/styles/Home.module.css";
 import { setDate } from "@/lib/getDate";
 
 
 export async function getServerSideProps(){
-    let docs = await getDocs(collection(db, 'history'));
+    let docs = await getDocs(query(collection(db, 'history'), orderBy('date')));
     let data: any[] = [];
 
     docs.forEach(d => {
