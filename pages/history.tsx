@@ -6,15 +6,16 @@ import { setDate } from "@/lib/getDate";
 
 
 export async function getServerSideProps(){
-    let docs = await getDocs(query(collection(db, 'history'), orderBy('date')));
+    let allData = await getDocs(query(collection(db, 'history'), orderBy('date')));
     let data: any[] = [];
+    let allData2 = allData.docs.reverse();
 
-    docs.forEach(d => {
+    allData2.map((d:any) => {
         data.push({
             id: d.id,
             player1: d.data().player1,
             player2: d.data().player2,
-            date: d.data().date
+            date: d.data().date.seconds
         })
     })
 
@@ -30,7 +31,7 @@ export default function Data({data}:any){
             <div className={styles.scroller}>
                 {data.map((d:any) => (
                     <div className={styles.playerData} key={d.id}>
-                        <h2>{d.player1} VS {d.player2}</h2>
+                        <h2 id={styles.playerTitle}>{d.player1} VS {d.player2}</h2>
                         <p>{setDate(d.date)}</p>
                         <b><Link href={'/history/' + d.id}>See Position</Link></b>
                     </div>

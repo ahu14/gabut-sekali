@@ -212,7 +212,7 @@ export default function ChessGame(){
                 else{
                     setMoveable({});
                     setMsg('invalid moves');
-                    setTimeout(() => setMsg(''), 1000);        
+                    setTimeout(() => setMsg(''), 1000);
                 }
             }
         }

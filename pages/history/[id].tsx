@@ -20,7 +20,7 @@ export async function getServerSideProps(context:any){
                 player2: d.data().player2,
                 chess: JSON.parse(JSON.stringify(d.data().chess)),
                 status: d.data().status,
-                date: JSON.stringify(d.data().date)
+                date: d.data().date.seconds
             });
         }
     })
@@ -63,26 +63,26 @@ export default function Data({data}:any){
 
 
     return (
-        <div className={styles.historyDisplay}>
-            <div className={styles.bottomData}>
-                <h3><Link href="/history">Go back</Link></h3>
-                <h3 id="name">{data[0].player2}</h3>
+        <div className={styles.dataDisplay}>
+            <h3><Link href="/history">Go back</Link></h3>
+            <h3 id="name">{data[0].player2}</h3>
 
-                <div className={styles.wrapper}>
-                    {current != undefined 
-                        ? <Chessboard id="preview-board" boardWidth={350}
-                        arePiecesDraggable={false} position={current} />
-                        : ''}
-                </div>
+            <div className={styles.wrapper}>
+                {current != undefined 
+                    ? <Chessboard id="preview-board" boardWidth={window.innerWidth > 768 ? 400 : 300}
+                    arePiecesDraggable={false} position={current} />
+                    : ''}
+            </div>
 
+            <div className={styles.boxData}>
                 <h3 id="name">{data[0].player1}</h3>
                 <p>{data[0].player1} vs {data[0].player2}</p>
                 <p>{data[0].status}</p>
                 <p>{setDateFormat(data[0].date)}</p>
-
-                <button onClick={nextMove} className={styles.rightButton}>&#8594;</button>
-                <button onClick={prevMove} className={styles.leftButton}>&#8592;</button>
             </div>
+
+            <button onClick={nextMove} className={styles.rightButton}>&#8594;</button>
+            <button onClick={prevMove} className={styles.leftButton}>&#8592;</button>
         </div>
     )
 }
