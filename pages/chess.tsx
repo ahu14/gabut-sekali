@@ -2,14 +2,14 @@ import {Chess} from "chess.js";
 import {Chessboard} from "react-chessboard";
 import {getCookie} from "../lib/cookie.js";
 import styles from "../styles/Home.module.css";
-import {useEffect, useState} from "react";
 import Router from "next/router";
+import { useState, useEffect } from "react";
 
 
-interface PlayerData{
+/*interface PlayerData{
     player1: string,
     player2: string
-}
+}*/
 
 
 /*export default function ChessGame(){
@@ -140,11 +140,7 @@ export default function ChessGame(){
 
 
     useEffect(() => {
-        if (moveablePlace == {}){
-            setMoveable({});
-        }
-
-        if (listMoves.length > 0 && position != {}){
+        if (listMoves.length > 0){
             let list:any = {};
 
             for (let i = 0; i < listMoves.length; i++){
@@ -191,7 +187,7 @@ export default function ChessGame(){
         if (listLegalMoves.length > 0){
             for (let i in moveablePlace){
                 if (sourceSquare == targetSquare){
-                    break;
+                    return false;
                 }
 
                 if (i == targetSquare){
@@ -206,7 +202,7 @@ export default function ChessGame(){
                     setColor(game.turn());
                     setCurrent('');
                     setMsg('');
-                    break;
+                    return true;
                 }
 
                 else{
@@ -222,17 +218,21 @@ export default function ChessGame(){
             setMsg('invalid moves');
             setTimeout(() => setMsg(''), 1000);
         }
+
+        return false;
     }
+
 
     return (
         <div className={styles.body} id="body">
             {color == 'b' ? <h2 id={styles.bold}>{players.player2}</h2> : <h2 id={styles.thin}>{players.player2}</h2>}
 
             <div className={styles.wrapper}>
-                <Chessboard id="chess-board" position={game.fen()} boardWidth={400} 
+                <Chessboard id="chess-board" position={game.fen()} 
+                boardWidth={400}
                 onMouseOverSquare={(move:any) => hovering(move)}
                 onPieceDrop={clicked} 
-                getPositionObject={position => setPosition(position)} 
+                getPositionObject={position => position = position} 
                 customSquareStyles={moveablePlace} />
             </div>
             

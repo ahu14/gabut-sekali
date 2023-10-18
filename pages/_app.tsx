@@ -6,7 +6,7 @@ import NextNProgress from 'nextjs-progressbar';
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <NextNProgress />
+      <NextNProgress color="#aaa" height={7} />
       <Component {...pageProps} />
     </>
   )

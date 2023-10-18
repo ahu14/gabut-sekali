@@ -36,17 +36,15 @@ export default function Form(){
 
     return(
         <Template>
-            <Suspense fallback={<h2>Loading Form</h2>}>
-                <form onSubmit={submitData} className={styles.formBox}>
-                    <h4>Black</h4>
-                    <input className={styles.inputBox} id="player2" name="player2" placeholder="Player 2"/>
-                    <h2 id={styles.font}>VS</h2>
-                    <h4>White</h4>
-                    <input className={styles.inputBox} id="player1" name="player1" placeholder="Player 1"/>
-                    <button type="submit" className={styles.submitBtn}>Submit</button>
-                    <p id="errorMsg"></p>
-                </form>
-            </Suspense>
+            <form onSubmit={submitData} className={styles.formBox}>
+                <h4>Black</h4>
+                <input className={styles.inputBox} id="player2" name="player2" placeholder="Player 2"/>
+                <h2 id={styles.font}>VS</h2>
+                <h4>White</h4>
+                <input className={styles.inputBox} id="player1" name="player1" placeholder="Player 1"/>
+                <button type="submit" className={styles.submitBtn}>Submit</button>
+                <p id="errorMsg"></p>
+            </form>
         </Template>
     )
 }
