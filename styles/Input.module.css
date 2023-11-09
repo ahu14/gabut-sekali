@@ -1,0 +1,94 @@
+.inputBody{
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+
+.formBox{
+    width: 50vw;
+    height: 30vh;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+  
+.inputBox{
+    padding: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    background: transparent;
+    border: 2px solid #e3e3e3;
+    color: #e3e3e3;
+    border-radius: 4px;
+}
+
+.inputBox::placeholder{
+    color: #e3e3e3;
+}
+
+.inputBox:focus{
+    outline: none;
+    background: #167873;
+}
+  
+#font{
+    padding: 3vh;
+}
+  
+.submitBtn{
+    margin: 3vh 0;
+    font-size: 16px;
+    font-family: inherit;
+    padding: 10px 12px;
+    background: #9bcfc6;
+    border: none;
+    border-radius: 5px;
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+}
+  
+.submitBtn:hover{
+    background: #167873;
+    color: #fff;
+}
+
+
+.radioWrapper{
+    width: 125px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    flex-wrap: wrap;
+    list-style: none;
+}
+
+.radioWrapper li{
+    padding: 2px 0;
+}
+
+.radioButton{
+    appearance: none;
+    -webkit-appearance: none;
+
+    margin: 0 10px;
+    border-radius: 50%;
+    border: 5px solid #1a918b;
+
+    outline: 5px solid #167873;
+    cursor: pointer;
+}
+
+.radioButton:checked{
+    border: 5px solid #fefefe;
+}
+
+#radioLabel{
+    cursor: pointer;
+}

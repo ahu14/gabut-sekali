@@ -1,24 +1,36 @@
-import Template from "@/lib/template.js";
-import Link from "next/link";
-import styles from "@/styles/Home.module.css";
+import {useEffect, useState} from "react";
+import About from "./components/about.component";
+import Difficulty from "./components/difficulty.component";
+import IndexHome from './components/home.component';
+import Form from "./components/input.component";
 
 
 export default function Home(){
-    return (
-        <Template>
-            <h2>Chess.com Rip Off</h2>
+    let [page, setPage] = useState<any>('home');
+    let [template, setTemplate] = useState<any>('');
 
-            <Link href="/game" id={styles.linkButton}>
-                <button className={styles.homeButton}>Play (u vs ur friend)</button>
-            </Link>
 
-            <Link href="/history" id={styles.linkButton}>
-                <button className={styles.homeButton}>Board</button>
-            </Link>
+    useEffect(() => {
+        if (page == 'difficulty'){
+            setTemplate(<Difficulty />)
+            setPage('difficulty');
+        }
+    }, [page]);
 
-            <Link href="/about" id={styles.linkButton}>
-                <button className={styles.homeButton}>About</button>
-            </Link>
-        </Template>
-    )
+
+    if (page == 'choose-difficulty'){
+        return <Difficulty />
+    }
+
+    else if (page == 'input-username'){
+        return <Form />
+    }
+
+    else if (page == 'about'){
+        return <About page={page} setPage={setPage} />
+    }
+
+    else{
+        return <IndexHome page={page} setPage={setPage} />
+    }
 }

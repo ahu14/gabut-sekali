@@ -1,13 +1,9 @@
-import styles from "../styles/Home.module.css";
-import {setCookie} from "../lib/cookie.js";
-import Template from "../lib/template.js";
-import { useRouter } from "next/router";
-import { Suspense } from "react";
+import styles from "@/styles/Input.module.css";
+import {setCookie} from "@/pages/lib/cookie.js";
+import Router from "next/router";
 
 
 export default function Form(){
-    let router = useRouter();
-
     let submitData = (e:any) => {
         e.preventDefault();
 
@@ -26,7 +22,8 @@ export default function Form(){
         if (checkIfBlank(player1) == false && checkIfBlank(player2) == false){
             setCookie('player1', player1);
             setCookie('player2', player2);
-            router.replace('/chess');
+            setCookie('vsWho', 'friend');
+            Router.push('/chess');
         }
 
         else{
@@ -35,7 +32,7 @@ export default function Form(){
     }
 
     return(
-        <Template>
+        <div className={styles.inputBody}>
             <form onSubmit={submitData} className={styles.formBox}>
                 <h4>Black</h4>
                 <input className={styles.inputBox} id="player2" name="player2" placeholder="Player 2"/>
@@ -45,6 +42,6 @@ export default function Form(){
                 <button type="submit" className={styles.submitBtn}>Submit</button>
                 <p id="errorMsg"></p>
             </form>
-        </Template>
+        </div>
     )
 }

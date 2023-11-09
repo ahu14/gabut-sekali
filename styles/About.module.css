@@ -1,0 +1,37 @@
+.about{
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+  text-align: center;
+}
+
+.headerAbout{
+  margin-right: 3vw;
+  width: 80vw;
+  height: 30vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+#title{
+  margin-bottom: 1.5vh;
+  text-align: left;
+}
+
+.bodyAbout{
+  width: 80vw;
+  height: 70vh;
+
+  display: flex;
+  justify-content: flex-start;
+  align-content: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+}

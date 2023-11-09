@@ -1,9 +1,9 @@
 import { getDocs, collection } from "firebase/firestore";
 import { Chessboard } from "react-chessboard";
-import { db } from "@/lib/db";
-import styles from "@/styles/Home.module.css";
+import { db } from "@/pages/lib/db";
+import styles from "@/styles/HistoryId.module.css";
 import { useState, useEffect } from "react";
-import { setDateFormat } from "@/lib/getDate";
+import { setDateFormat } from "@/pages/lib/getDate";
 import Link from "next/link";
 
 
@@ -69,8 +69,10 @@ export default function Data({data}:any){
 
             <div className={styles.wrapper}>
                 {current != undefined 
-                    ? <Chessboard id="preview-board" boardWidth={window.innerWidth > 768 ? 400 : 300}
-                    arePiecesDraggable={false} position={current} />
+                    ? <div className={styles.boardWrapper}>
+                        <Chessboard id="preview-board" boardWidth={window.innerWidth > 768 ? 400 : 300}
+                        arePiecesDraggable={false} position={current} />
+                        </div>
                     : ''}
             </div>
 
