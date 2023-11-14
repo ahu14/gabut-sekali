@@ -81,6 +81,10 @@
     color: #fefefe;
 }
 
+#about{
+    cursor: pointer;
+}
+
 
 @media screen and (max-width: 768px) {
     .home{

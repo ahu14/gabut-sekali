@@ -11,7 +11,7 @@ export default function ChessGame(){
     let [fen, setFen] = useState<string>('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
     let depthOptions = {easy: 2, medium: 5, hard: 8};
 
-    let players = useSelector((state: any) => ({player1: state.player1, player2: state.player2}));
+    let [players, setPlayers] = useState({player1: '', player2: ''})
     let moveablePlace = useSelector((state:any) => state.moveablePlace);
     let game = useSelector((state:any) => state.game);
     let position = useSelector((state:any) => state.position);
@@ -21,6 +21,8 @@ export default function ChessGame(){
 
 
     useEffect(() => {
+        console.log('rerender');
+
         if (getCookie('vsWho') == 'friend'){
             dispatch({type: 'setType', playType: 'friend'});
             dispatch({
@@ -64,6 +66,9 @@ export default function ChessGame(){
             }
         }
 
+        setPlayers({player1: getCookie('player1'), player2: getCookie('player2')});
+        dispatch({type: 'getWorker'});
+
         document.addEventListener('mousemove', (e:any) => {
             if (e.target.id == 'body'){
                 dispatch({type: 'moveableBlank'});
@@ -76,7 +81,8 @@ export default function ChessGame(){
         if (color != undefined){
             let color2 = game.turn() == 'w' ? 'white' : 'black';
 
-            if (getCookie('vsWho') == 'ai' && color2 != getCookie('playAs')){
+            if (getCookie('vsWho') == 'ai' && color2 != getCookie('playAs') 
+                && msg == '' || msg == 'invalid moves'){
                 dispatch({type: 'activateAi', fen: (string:string) => setFen(string)});
                 dispatch({type: 'clearListMoves'});
             }
@@ -144,7 +150,8 @@ export default function ChessGame(){
 
     return (
         <div className={styles.body} id="body">
-            <h2>{players.player2}</h2>
+            <p>it's {game.turn()} turn now</p>
+            <h3>{players.player2}</h3>
 
             <div className={styles.chessWrapper}>
                 <Chessboard id="chess-board" 
@@ -155,8 +162,8 @@ export default function ChessGame(){
                 customSquareStyles={moveablePlace} />
             </div>
 
-            <h2>{players.player1}</h2>
-            <h2>{msg}</h2>
+            <h3>{players.player1}</h3>
+            <h3>{msg}</h3>
         </div>
     )
 }

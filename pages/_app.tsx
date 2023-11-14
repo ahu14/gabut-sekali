@@ -8,7 +8,7 @@ import store from "@/pages/reducer/index.js";
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
-      <NextNProgress color="#aaa" height={7} />
+      <NextNProgress color="#167873" height={7} />
       <Component {...pageProps} />
     </Provider>
   )

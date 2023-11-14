@@ -1,15 +1,13 @@
 import {Chess} from "chess.js";
-import { getCookie } from "../lib/cookie";
+import { getCookie, deleteCookie } from "../lib/cookie";
 import converter from "@/pages/lib/moveConverter.js";
 import Router from "next/router";
-import Engine from "../lib/engine.js";
 
 
 let initialState = {
     type: '',
     depth: null,
-    player1: '',
-    player2: '',
+    stockfish: null,
     game: new Chess(),
     listMoves: [],
     position: {},
@@ -23,19 +21,20 @@ let initialState = {
 
 function reducer(state = initialState, action){
     switch (action.type){
+        case 'getWorker':
+            state.stockfish = new Worker("./stockfish.js");
+            return ({...state, stockfish: state.stockfish});
+
+    
         case 'activateAi':
-            const stockfish = new Worker("./stockfish.js");
+            state.stockfish.postMessage("uci");
+            state.stockfish.postMessage(`position fen ${state.game.fen()}`);
+            state.stockfish.postMessage(`go depth ${state.depth}`);
 
-            stockfish.postMessage("uci");
-            stockfish.postMessage(`position fen ${state.game.fen()}`);
-            stockfish.postMessage(`go depth ${state.depth}`);
-
-            stockfish.onmessage = (e) => {
+            state.stockfish.onmessage = (e) => {
                 let move = e.data.match(/bestmove\s+(\S+)/)?.[1]
 
                 if (move){
-                    console.log(state.chessPlay);
-
                     state.game.move({
                         from: move.substring(0, 2),
                         to: move.substring(2, 4),
@@ -54,8 +53,6 @@ function reducer(state = initialState, action){
 
 
         case 'hover':
-            //console.log(state);
-
             if (state.game.moves({square: action.move}).length > 0){
                 return ({   
                     ...state,
@@ -77,8 +74,6 @@ function reducer(state = initialState, action){
             
 
         case 'customSquare':
-            //console.log(state);
-            
             if (state.listMoves != []){
                 let list = {}
                 
@@ -108,9 +103,6 @@ function reducer(state = initialState, action){
 
 
         case 'clicked':
-            //console.log(state);
-            //console.log(action);
-            
             let listLegalMoves = state.game.moves({square: action.sourceSquare});
 
             if (listLegalMoves.length > 0){
@@ -149,19 +141,15 @@ function reducer(state = initialState, action){
             }
 
 
-        case 'saveData':
+        case 'saveData':            
             if (state.msg != '' && state.msg != 'invalid moves'){
-                //console.log(state.chessPlay);
-
                 let data2 = {
                     status: state.msg,
-                    chess: state.chessPlay
+                    chess: state.chessPlay,
+                    player1: action.player1,
+                    player2: action.player2
                 }
 
-                data2['player1'] = action.player1;
-                data2['player2'] = action.player2;
-
-        
                 let JSONdata = JSON.stringify(data2);
         
                 let endPoint = '/api/addData';
@@ -174,14 +162,25 @@ function reducer(state = initialState, action){
                 fetch(endPoint, options)
                 .then(res => res.json())
                 .then(msg => Router.push('/'));
+
+                return ({
+                    type: '',
+                    msg: state.msg,
+                    depth: null,
+                    game: new Chess(),
+                    listMoves: [],
+                    position: {},
+                    moveablePlace: {},
+                    currentPlace: '',
+                    chessPlay: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'],
+                    color: () => game.turn()
+                })
             }
 
 
         case 'winOrLose':
-            //console.log(state.chessPlay);
-
-            if (state.game.isCheckmate()){
-                state.msg = `${state.color == 'b' ? getCookie('player2') : getCookie('player1')} got checkmated`;
+            if (state.game.isCheckmate()){    
+                state.msg = `${state.color == 'b' ? getCookie('player1') : getCookie('player2')} got checkmated`
             }
     
             if (state.game.isDraw()){
@@ -189,7 +188,7 @@ function reducer(state = initialState, action){
             }
     
             if (state.game.isStalemate()){
-                state.msg = `${state.color == 'b' ? getCookie('player2') : getCookie('player1')} got stalemates. so it's draw.`;
+                state.msg = `${state.color == 'b' ? getCookie('player1') : getCookie('player2')} got stalemated. so it's draw.`
             }
     
             if (state.game.isThreefoldRepetition()){
@@ -213,9 +212,17 @@ function reducer(state = initialState, action){
             
         case 'customSquareStyles':
             return ({...state, moveablePlace: state.moveablePlace});
-
+            
 
         case 'clearMsg':
+            if (state.msg != '' && state.msg != 'invalid moves'){
+                deleteCookie('vsWho');
+                deleteCookie('difficulty');
+                deleteCookie('player1');
+                deleteCookie('player2');
+                deleteCookie('playAs');
+            }
+
             return ({...state, msg: ''});
 
 

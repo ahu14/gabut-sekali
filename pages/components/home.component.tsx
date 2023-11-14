@@ -58,7 +58,7 @@ export default function IndexHome({page, setPage}:any){
                     <button className={styles.button} onClick={() => setPage('choose-difficulty')}>Vs Ai</button>
 
                     <Link href="/history">
-                        <button className={styles.button}>Board</button>
+                        <button className={styles.button}>History</button>
                     </Link>
                 </div>
             </div>
