@@ -1,5 +1,5 @@
 import styles from "@/styles/Input.module.css";
-import {setCookie} from "@/pages/lib/cookie.js";
+import {setCookie} from "@/lib/cookie.js";
 import Router from "next/router";
 
 

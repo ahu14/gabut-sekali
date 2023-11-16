@@ -1,5 +1,5 @@
 import {Chessboard} from "react-chessboard";
-import {getCookie, setCookie} from "@/pages/lib/cookie.js";
+import {getCookie, setCookie} from "@/lib/cookie.js";
 import styles from "@/styles/Chess.module.css";
 import { useState, useEffect, useRef } from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -7,7 +7,6 @@ import {useDispatch, useSelector} from "react-redux";
 
 export default function ChessGame(){
     let [color, setColor] = useState<any>();
-    let [depth, setDepth] = useState<any>();
     let [fen, setFen] = useState<string>('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
     let depthOptions = {easy: 2, medium: 5, hard: 8};
 
@@ -21,8 +20,6 @@ export default function ChessGame(){
 
 
     useEffect(() => {
-        console.log('rerender');
-
         if (getCookie('vsWho') == 'friend'){
             dispatch({type: 'setType', playType: 'friend'});
             dispatch({
@@ -36,8 +33,8 @@ export default function ChessGame(){
             let difficulty = getCookie('difficulty');
             let getDepth = depthOptions[difficulty as keyof typeof depthOptions];
 
-            dispatch({type: 'setType', playType: 'ai'});
             dispatch({type: 'setDepth', depth: getDepth});
+            dispatch({type: 'setType', playType: 'ai'});
             
             if (getCookie('playAs') == 'white'){
                 setColor('white');
@@ -83,8 +80,10 @@ export default function ChessGame(){
 
             if (getCookie('vsWho') == 'ai' && color2 != getCookie('playAs') 
                 && msg == '' || msg == 'invalid moves'){
-                dispatch({type: 'activateAi', fen: (string:string) => setFen(string)});
-                dispatch({type: 'clearListMoves'});
+                setTimeout(() => {
+                    dispatch({type: 'activateAi', fen: (string:string) => setFen(string)});
+                    dispatch({type: 'clearListMoves'});
+                }, 1000);
             }
         }
     }, [color, game.turn()]);
@@ -150,8 +149,9 @@ export default function ChessGame(){
 
     return (
         <div className={styles.body} id="body">
-            <p>it's {game.turn()} turn now</p>
-            <h3>{players.player2}</h3>
+            <div className={styles.boxWrapper}>
+                {game.turn() == 'b' ? <h3>{players.player2}</h3> : <p>{players.player2}</p>}
+            </div>
 
             <div className={styles.chessWrapper}>
                 <Chessboard id="chess-board" 
@@ -162,8 +162,13 @@ export default function ChessGame(){
                 customSquareStyles={moveablePlace} />
             </div>
 
-            <h3>{players.player1}</h3>
-            <h3>{msg}</h3>
+            <div className={styles.boxWrapper}>
+                {game.turn() == 'w' ? <h3>{players.player1}</h3> : <p>{players.player1}</p>}
+            </div>
+
+            <div className={styles.boxWrapper}>
+                <h3>{msg}</h3>
+            </div>
         </div>
     )
 }

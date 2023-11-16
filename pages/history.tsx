@@ -1,8 +1,8 @@
-import {db} from "@/pages/lib/db";
+import {db} from "@/lib/db";
 import Link from "next/link";
 import { getDocs, collection, orderBy, query } from "firebase/firestore";
 import styles from "@/styles/History.module.css";
-import { setDate } from "@/pages/lib/getDate";
+import { setDate } from "@/lib/getDate";
 
 
 export async function getServerSideProps(){

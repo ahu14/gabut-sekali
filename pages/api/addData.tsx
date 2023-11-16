@@ -1,5 +1,5 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
-import {db} from "@/pages/lib/db";
+import {db} from "@/lib/db";
 import {collection, addDoc, serverTimestamp} from "firebase/firestore";
 
 

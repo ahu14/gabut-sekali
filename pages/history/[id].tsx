@@ -1,9 +1,9 @@
 import { getDocs, collection } from "firebase/firestore";
 import { Chessboard } from "react-chessboard";
-import { db } from "@/pages/lib/db";
+import { db } from "@/lib/db";
 import styles from "@/styles/HistoryId.module.css";
 import { useState, useEffect } from "react";
-import { setDateFormat } from "@/pages/lib/getDate";
+import { setDateFormat } from "@/lib/getDate";
 import Link from "next/link";
 
 

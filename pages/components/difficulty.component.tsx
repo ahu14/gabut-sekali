@@ -1,6 +1,6 @@
 import styles from "@/styles/Input.module.css";
 import Router from "next/router";
-import { setCookie } from "@/pages/lib/cookie";
+import { setCookie } from "@/lib/cookie";
 
 
 export default function Difficulty(){

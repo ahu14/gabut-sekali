@@ -1,6 +1,6 @@
 import {Chess} from "chess.js";
-import { getCookie, deleteCookie } from "../lib/cookie";
-import converter from "@/pages/lib/moveConverter.js";
+import { getCookie, deleteCookie } from "@/lib/cookie";
+import converter from "@/lib/moveConverter.js";
 import Router from "next/router";
 
 
@@ -103,41 +103,35 @@ function reducer(state = initialState, action){
 
 
         case 'clicked':
-            let listLegalMoves = state.game.moves({square: action.sourceSquare});
-
-            if (listLegalMoves.length > 0){
-                for (let i in state.moveablePlace){
-                    if (action.sourceSquare == action.targetSquare){
-                        return false;
-                    }
-
-                    if (i == action.targetSquare){
-                        state.game.move({
-                            from: action.sourceSquare,
-                            to: action.targetSquare,
-                            promotion: 'q'
-                        });
-
-                        state.chessPlay.push(state.game.fen());
-
-                        return ({
-                            ...state,
-                            chessPlay: state.chessPlay,
-                            moveablePlace: {},
-                            listMoves: [],
-                            game: state.game,
-                            color: state.game.turn(),
-                            currentPlace: '',
-                            msg: ''
-                        })
-                    }
-                }
-
-                return ({...state, msg: 'invalid moves'})
+            if (action.sourceSquare == action.targetSquare){
+                return false;
             }
 
             else{
-                return ({...state, msg: 'invalid moves'})
+                try{
+                    state.game.move({
+                        from: action.sourceSquare,
+                        to: action.targetSquare,
+                        promotion: 'q'
+                    });
+
+                    state.chessPlay.push(state.game.fen());
+
+                    return ({
+                        ...state,
+                        chessPlay: state.chessPlay,
+                        moveablePlace: {},
+                        listMoves: [],
+                        game: state.game,
+                        color: state.game.turn(),
+                        currentPlace: '',
+                        msg: ''
+                    })
+                }
+                
+                catch (err){
+                    return ({...state, msg: 'invalid moves'})
+                }
             }
 
 
@@ -180,7 +174,7 @@ function reducer(state = initialState, action){
 
         case 'winOrLose':
             if (state.game.isCheckmate()){    
-                state.msg = `${state.color == 'b' ? getCookie('player1') : getCookie('player2')} got checkmated`
+                state.msg = `${state.color == 'b' ? getCookie('player2') : getCookie('player1')} got checkmated`
             }
     
             if (state.game.isDraw()){
